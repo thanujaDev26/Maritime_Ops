@@ -31,12 +31,23 @@ public class Operation {
 
     private LocalDateTime endTime;
 
+    // Link to ship
     @ManyToOne
     @JoinColumn(name = "ship_id")
     private Ship ship;
 
+    // Link to port where operation occurs
     @ManyToOne
     @JoinColumn(name = "port_id")
     private Port port;
+
+    // Managing operation team
+    @ManyToOne
+    @JoinColumn(name = "opsteam_id")
+    private Opsteam operationTeam;
+
+    private String notes;  // Optional
+
+    private Integer queuePosition; // To keep track of operation order if needed
 
 }

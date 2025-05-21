@@ -1,6 +1,5 @@
 package com.Maritime.CruiseShipsOpsAPI.entity;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,21 +13,25 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Port {
-
+public class Opsteam {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    private String teamName;
 
-    private String country;
+    private String description;
 
-    @OneToMany(mappedBy = "homePort")
+    // Ships managed by this team
+    @OneToMany(mappedBy = "managingTeam")
     private Set<Ship> ships;
 
-    @OneToMany(mappedBy = "port")
-    private Set<Operation> operationsAtPort;
+    // Operations handled by this team
+    @OneToMany(mappedBy = "operationTeam")
+    private Set<Operation> operations;
 
+    // Crew members in this team
+    @OneToMany(mappedBy = "opsteam")
+    private Set<Crew> crew;
 
 }

@@ -1,20 +1,17 @@
 package com.Maritime.CruiseShipsOpsAPI.entity;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Set;
-
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Port {
+public class Crew {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,13 +19,17 @@ public class Port {
 
     private String name;
 
-    private String country;
+    private String role; // e.g., Captain, Engineer, etc.
 
-    @OneToMany(mappedBy = "homePort")
-    private Set<Ship> ships;
+    // Which ship they belong to (could be nullable if assigned to team only)
+    @ManyToOne
+    @JoinColumn(name = "ship_id")
+    private Ship ship;
 
-    @OneToMany(mappedBy = "port")
-    private Set<Operation> operationsAtPort;
-
+    // Operation team they belong to
+    @ManyToOne
+    @JoinColumn(name = "opsteam_id")
+    private Opsteam opsteam;
 
 }
+
