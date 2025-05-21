@@ -6,6 +6,8 @@ import com.Maritime.CruiseShipsOpsAPI.dto.response.PortResponseDto;
 import com.Maritime.CruiseShipsOpsAPI.dto.response.PortResponseWithShipDto;
 import com.Maritime.CruiseShipsOpsAPI.entity.Port;
 import com.Maritime.CruiseShipsOpsAPI.entity.Ship;
+import com.Maritime.CruiseShipsOpsAPI.exception.PortNotFoundException;
+import com.Maritime.CruiseShipsOpsAPI.exception.ShipNotFoundException;
 import com.Maritime.CruiseShipsOpsAPI.repository.PortRepo;
 import com.Maritime.CruiseShipsOpsAPI.repository.ShipRepo;
 import com.Maritime.CruiseShipsOpsAPI.service.IPortService;
@@ -32,7 +34,7 @@ public class PortServiceImpl implements IPortService {
 
     @Override
     public PortResponseDto getPortDetails(Long id) {
-        Port port = this.portRepo.findById(id).orElseThrow(()->new RuntimeException(String.format("This port has not found", id)));
+        Port port = this.portRepo.findById(id).orElseThrow(()->new PortNotFoundException(String.format("This port has not found", id)));
         this.portRepo.save(port);
         return this.mapper.portEntityToDto(port);
     }
@@ -46,7 +48,7 @@ public class PortServiceImpl implements IPortService {
 
     @Override
     public PortResponseDto updatePortDetails(Long id, PortRequestDto dto) {
-        Port searchedPort = this.portRepo.findById(id).orElseThrow(()->new RuntimeException(String.format("This port has not found", id)));
+        Port searchedPort = this.portRepo.findById(id).orElseThrow(()->new PortNotFoundException(String.format("This port has not found", id)));
         searchedPort.setName(dto.getName());
         searchedPort.setCountry(dto.getCountry());
         return this.mapper.portEntityToDto(this.portRepo.save(searchedPort));
@@ -56,7 +58,7 @@ public class PortServiceImpl implements IPortService {
     public int deletePortDetails(Long id) {
 //        Port searchedPort = this.portRepo.findById(id).orElseThrow(()->new RuntimeException(String.format("This port has not found", id)));
         if(!this.portRepo.existsById(id)){
-            throw new RuntimeException(String.format("This port has not found", id));
+            throw new PortNotFoundException(String.format("This port has not found", id));
         }
         else {
             this.portRepo.deleteById(id);
@@ -72,21 +74,21 @@ public class PortServiceImpl implements IPortService {
 
     @Override
     public PortResponseWithShipDto associateNewShipToPort(Long portId, Long shipId) {
-        Port port = this.portRepo.findById(portId).orElseThrow(()->new RuntimeException(String.format("Port not found with id ", portId)));
-        Ship ship = this.shipRepo.findById(shipId).orElseThrow(()->new RuntimeException(String.format("Ship not found with id ", shipId)));
+        Port port = this.portRepo.findById(portId).orElseThrow(()->new PortNotFoundException(String.format("Port not found with id ", portId)));
+        Ship ship = this.shipRepo.findById(shipId).orElseThrow(()->new ShipNotFoundException(String.format("Ship not found with id ", shipId)));
 
         ship.setHomePort(port);
         this.shipRepo.save(ship);
 //        return this.mapper.portWithShipsEntityToDto(this.portRepo.findById(portId));
         Port updatedPort = this.portRepo.findById(portId)
-                .orElseThrow(() -> new RuntimeException(String.format("Port not found with id %d", portId)));
+                .orElseThrow(() -> new PortNotFoundException(String.format("Port not found with id %d", portId)));
         return this.mapper.portWithShipsEntityToDto(updatedPort);
     }
 
     @Override
     public PortResponseWithShipDto disassociateShipFromPort(Long portId, Long shipId) {
-        Port port = this.portRepo.findById(portId).orElseThrow(()->new RuntimeException(String.format("Port not found with id ", portId)));
-        Ship ship = this.shipRepo.findById(shipId).orElseThrow(()->new RuntimeException(String.format("Ship not found with id ", shipId)));
+        Port port = this.portRepo.findById(portId).orElseThrow(()->new PortNotFoundException(String.format("Port not found with id ", portId)));
+        Ship ship = this.shipRepo.findById(shipId).orElseThrow(()->new ShipNotFoundException(String.format("Ship not found with id ", shipId)));
 
         if(ship.getHomePort() != null && ship.getHomePort().getId().equals(portId)){
             ship.setHomePort(null);
@@ -98,7 +100,7 @@ public class PortServiceImpl implements IPortService {
 
 //        return this.mapper.portWithShipsEntityToDto(this.portRepo.findById(portId));
         Port updatedPort = this.portRepo.findById(portId)
-                .orElseThrow(() -> new RuntimeException(String.format("Port not found with id %d", portId)));
+                .orElseThrow(() -> new PortNotFoundException(String.format("Port not found with id %d", portId)));
         return this.mapper.portWithShipsEntityToDto(updatedPort);
     }
 }

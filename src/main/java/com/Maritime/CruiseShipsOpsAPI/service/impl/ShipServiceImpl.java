@@ -4,6 +4,8 @@ import com.Maritime.CruiseShipsOpsAPI.dto.request.ShipRequestDto;
 import com.Maritime.CruiseShipsOpsAPI.dto.response.ShipResponseDto;
 import com.Maritime.CruiseShipsOpsAPI.entity.Port;
 import com.Maritime.CruiseShipsOpsAPI.entity.Ship;
+import com.Maritime.CruiseShipsOpsAPI.exception.PortNotFoundException;
+import com.Maritime.CruiseShipsOpsAPI.exception.ShipNotFoundException;
 import com.Maritime.CruiseShipsOpsAPI.repository.PortRepo;
 import com.Maritime.CruiseShipsOpsAPI.repository.ShipRepo;
 import com.Maritime.CruiseShipsOpsAPI.service.IShipService;
@@ -38,7 +40,7 @@ public class ShipServiceImpl implements IShipService {
 
     @Override
     public ShipResponseDto getShipById(Long id){
-       Ship searchedShip = this._repo.findById(id).orElseThrow(()->new RuntimeException(String.format("This Ship is not found ", id)));
+       Ship searchedShip = this._repo.findById(id).orElseThrow(()->new ShipNotFoundException(String.format("This Ship is not found ", id)));
        return this._mapper.shipEntityToDto(searchedShip);
     }
 
@@ -53,7 +55,7 @@ public class ShipServiceImpl implements IShipService {
     @Transactional
     public int deleteShip(Long id) {
         if (!_repo.existsById(id)) {
-            throw new RuntimeException("Ship with ID " + id + " not found.");
+            throw new ShipNotFoundException("Ship with ID " + id + " not found.");
         }
         else {
             _repo.deleteById(id);
@@ -64,9 +66,9 @@ public class ShipServiceImpl implements IShipService {
 
     @Override
     public ShipResponseDto updateShip(Long id, ShipRequestDto shipRequestDto) {
-       Ship searchedShip = this._repo.findById(id).orElseThrow(()->new RuntimeException(String.format("This ship has not found ", id)));
+       Ship searchedShip = this._repo.findById(id).orElseThrow(()->new ShipNotFoundException(String.format("This ship has not found ", id)));
        Port updatablePort = this._portRepo.findById(shipRequestDto.getHomePortId()).orElseThrow(
-               ()->new RuntimeException(String.format("This Port has not found", shipRequestDto.getHomePortId())));
+               ()->new PortNotFoundException(String.format("This Port has not found", shipRequestDto.getHomePortId())));
        searchedShip.setName(shipRequestDto.getName());
        searchedShip.setType(shipRequestDto.getType());
        searchedShip.setLaunchDate(shipRequestDto.getLaunchDate());

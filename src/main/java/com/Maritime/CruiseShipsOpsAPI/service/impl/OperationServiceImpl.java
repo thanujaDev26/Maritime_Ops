@@ -8,6 +8,9 @@ import com.Maritime.CruiseShipsOpsAPI.entity.Operation;
 import com.Maritime.CruiseShipsOpsAPI.entity.Port;
 import com.Maritime.CruiseShipsOpsAPI.entity.Ship;
 import com.Maritime.CruiseShipsOpsAPI.entity.enums.OperationStatus;
+import com.Maritime.CruiseShipsOpsAPI.exception.OperationNotFoundException;
+import com.Maritime.CruiseShipsOpsAPI.exception.PortNotFoundException;
+import com.Maritime.CruiseShipsOpsAPI.exception.ShipNotFoundException;
 import com.Maritime.CruiseShipsOpsAPI.repository.OperationRepo;
 import com.Maritime.CruiseShipsOpsAPI.repository.PortRepo;
 import com.Maritime.CruiseShipsOpsAPI.repository.ShipRepo;
@@ -42,9 +45,9 @@ public class OperationServiceImpl implements IOperationService {
     @Override
     public OperationResponseDto createOperation(OperationRequestDto dto) {
         Ship ship = this.shipRepo.findById(dto.getShipId())
-                .orElseThrow(() -> new RuntimeException("Ship is not found"));
+                .orElseThrow(() -> new ShipNotFoundException("Ship is not found"));
         Port port = this.portRepo.findById(dto.getPortId())
-                .orElseThrow(() -> new RuntimeException("Port is not found"));
+                .orElseThrow(() -> new PortNotFoundException("Port is not found"));
 
         Operation operation = mapper.portDtoToEntity(dto);
 
@@ -78,7 +81,7 @@ public class OperationServiceImpl implements IOperationService {
     public List<OperationResponseDto> getOperationsByShipId(Long shipId) {
         List<Operation> ops = this.OpsRepo.findByShipId(shipId);
         if (ops.isEmpty()){
-            throw new RuntimeException("Operations are not found from this ship at the moment");
+            throw new OperationNotFoundException("Operations are not found from this ship at the moment");
         }
         return this.mapper.portEntityToDtoList(ops);
     }
@@ -87,14 +90,14 @@ public class OperationServiceImpl implements IOperationService {
     public List<OperationResponseDto> getOperationsByPortId(Long portId) {
         List<Operation> ops = this.OpsRepo.findByPortId(portId);
         if (ops == null){
-            throw new RuntimeException("Operations are not found from this ship at the moment");
+            throw new OperationNotFoundException("Operations are not found from this ship at the moment");
         }
         return this.mapper.portEntityToDtoList(ops);
     }
 
     @Override
     public OperationStatusResponseDto updateLatestOperationStatusByShip(Long shipId, OperationStatusRequestDto Dto) {
-        Operation ops = this.OpsRepo.findTopByShipIdOrderByStartTimeDesc(shipId).orElseThrow(()->new RuntimeException("Operations cannot fetched from this ship"));
+        Operation ops = this.OpsRepo.findTopByShipIdOrderByStartTimeDesc(shipId).orElseThrow(()->new OperationNotFoundException("Operations cannot fetched from this ship"));
 
         ops.setOperationStatus(Dto.getStatus());
         Operation updated = OpsRepo.save(ops);
